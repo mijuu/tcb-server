@@ -1,0 +1,27 @@
+{
+  "name": "tcb-server",
+  "version": "0.9.0",
+  "description": "Tencent cloudbase lite server framework",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mijuu/tcb-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mijuu/tcb-server/issues"
+  },
+  "homepage": "https://github.com/mijuu/tcb-server#readme",
+  "author": "raymond.liang@outlook.com",
+  "license": "MIT",
+  "dependencies": {
+    "is-type-of": "^1.2.1",
+    "tcb-admin-node": "^1.23.0",
+    "tcb-router": "^1.1.2"
+  },
+  "devDependencies": {
+    "eslint": "^7.4.0"
+  }
+}
