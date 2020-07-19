@@ -1,11 +1,12 @@
 'use strict';
 const TcbServerRouter = require('./router');
+const BaseContextClass = require('./base-context-class');
 const cloud = require('tcb-admin-node');
 const is = require('is-type-of');
 const fs = require('fs');
 const path = require('path');
 
-class TcbServer {
+class Application {
   constructor (config) {
     this.app = {
       cloud,
@@ -76,4 +77,7 @@ function bindClassInstance (Class, app) {
   return instance
 }
 
-module.exports = TcbServer;
+module.exports = {
+  Application,
+  BaseContextClass
+};
