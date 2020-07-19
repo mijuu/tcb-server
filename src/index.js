@@ -34,8 +34,6 @@ class TcbServer {
   }
 
   serve ({ event, router }) {
-    event.$url = event.$url || event.path;
-
     router(this.app);
     return this.server.serve(event, this.app.ctx);
   }

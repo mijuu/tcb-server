@@ -6,7 +6,7 @@ class TcbServerRouter extends TcbRouter {
    * start the route server
    */
   serve(event, ctx) {
-      ctx.request = { event, url: event.$url };
+      ctx.request = { event, url: event.path };
       let _routerMiddlewares = this._routerMiddlewares;
       let url = ctx.request.url;
 
