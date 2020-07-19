@@ -6,18 +6,14 @@ const fs = require('fs');
 const path = require('path');
 
 class TcbServer {
-  constructor ({ env, credentials, version }) {
+  constructor (config) {
     this.app = {
       cloud,
       ctx: {}
     };
     this.loadModules();
     // init tcb sdk
-    this.app.cloud.init({
-      env,
-      credentials,
-      version
-    });
+    this.app.cloud.init(config);
   }
 
   loadModules () {
