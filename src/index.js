@@ -61,7 +61,7 @@ class TcbServer {
     this.app.use = this.app.ctx.use;
 
     router(this.app);
-    this.app.ctx.serve();
+    return this.app.ctx.serve();
   }
 }
 
