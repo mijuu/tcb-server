@@ -7,12 +7,13 @@ const path = require('path');
 
 class TcbServer {
   constructor ({ env, credentials, version }) {
-    this.app = null;
-    this.modules = {};
+    this.app = {
+      cloud,
+      ctx: {}
+    };
     this.loadModules();
-    this.cloud = cloud;
     // init tcb sdk
-    this.cloud.init({
+    this.app.cloud.init({
       env,
       credentials,
       version
@@ -27,7 +28,7 @@ class TcbServer {
       if (!fs.existsSync(directory))
         continue;
       const exports = this.registerModules(directory);
-      this.modules[directory] = exports;
+      this.app[directory] = exports;
     }
   }
 
@@ -42,11 +43,11 @@ class TcbServer {
         const fullPath = path.join(process.cwd(), filePath);
         const obj = require(fullPath);
         if (is.class(obj)) {
-          // compatible class
-          exports[path.basename(file, '.js')] = new obj();
+          // new a class instance and bind all methods
+          exports[path.basename(file, '.js')] = bindClassInstance(obj, this.app);
         }
         if (is.function(obj) && !is.class(obj)) {
-          exports[path.basename(file, '.js')] = obj;
+          exports[path.basename(file, '.js')] = obj.bind(this.app);
         }
       }
     }
@@ -55,15 +56,28 @@ class TcbServer {
 
   serve ({ event, router }) {
     event.$url = event.$url || event.path;
-    this.app = new TcbServerRouter({ event });
-    // attach all modules
-    Object.assign(this.app, { ...this.modules })
-    // attach tcb sdk instance
-    this.app.cloud = this.cloud;
+    this.app.ctx = new TcbServerRouter({ event });
+    this.app.router = this.app.ctx.router.bind(this.app.ctx);
+    this.app.use = this.app.ctx.use;
 
     router(this.app);
-    this.app.serve();
+    this.app.ctx.serve();
   }
+}
+
+function bindClassInstance (Class, app) {
+  const instance = new Class(app);
+  const protos = Class.prototype;
+  const keys = Object.getOwnPropertyNames(protos);
+  for (const key of keys) {
+    if (key === 'constructor')
+      continue
+    
+    const desc = Object.getOwnPropertyDescriptor(protos, key);
+    if (is.function(desc.value))
+      instance[key] = instance[key].bind(app)
+  }
+  return instance
 }
 
 module.exports = TcbServer;
