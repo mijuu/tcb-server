@@ -11,54 +11,56 @@ class TcbServer {
       cloud,
       ctx: {}
     };
-    this.loadModules();
     // init tcb sdk
     this.app.cloud.init(config);
+    this.loadModules();
+
+    this.server = new TcbServerRouter();
+    this.app.router = this.server.router.bind(this.server);
+    this.app.use = this.server.use;
   }
 
   loadModules () {
     // load all directories js modules
     const directories = ['controller', 'middleware', 'service'];
 
+    directories.forEach(directory => { this.app[directory] = {}});
     for (const directory of directories) {
       if (!fs.existsSync(directory))
         continue;
-      const exports = this.registerModules(directory);
-      this.app[directory] = exports;
+      const exports = registerModules(directory, this.app);
+      Object.assign(this.app[directory], exports);
     }
-  }
-
-  registerModules (directory) {
-    const exports = {};
-    const files = fs.readdirSync(directory);
-    for (const file of files) {
-      const filePath = path.join(directory, file);
-      if (fs.statSync(filePath).isDirectory()) {
-        exports[file] = this.registerModules(filePath);
-      } else {
-        const fullPath = path.join(process.cwd(), filePath);
-        const obj = require(fullPath);
-        if (is.class(obj)) {
-          // new a class instance and bind all methods
-          exports[path.basename(file, '.js')] = bindClassInstance(obj, this.app);
-        }
-        if (is.function(obj) && !is.class(obj)) {
-          exports[path.basename(file, '.js')] = obj.bind(this.app);
-        }
-      }
-    }
-    return exports;
   }
 
   serve ({ event, router }) {
     event.$url = event.$url || event.path;
-    this.app.ctx = new TcbServerRouter({ event });
-    this.app.router = this.app.ctx.router.bind(this.app.ctx);
-    this.app.use = this.app.ctx.use;
 
     router(this.app);
-    return this.app.ctx.serve();
+    return this.server.serve(event, this.app.ctx);
   }
+}
+
+function registerModules (directory, app) {
+  const exports = {};
+  const files = fs.readdirSync(directory);
+  for (const file of files) {
+    const filePath = path.join(directory, file);
+    if (fs.statSync(filePath).isDirectory()) {
+      exports[file] = registerModules(filePath, app);
+    } else {
+      const fullPath = path.join(process.cwd(), filePath);
+      const obj = require(fullPath);
+      if (is.class(obj)) {
+        // new a class instance and bind all methods
+        exports[path.basename(file, '.js')] = bindClassInstance(obj, app);
+      }
+      if (is.function(obj) && !is.class(obj)) {
+        exports[path.basename(file, '.js')] = obj.bind(app);
+      }
+    }
+  }
+  return exports;
 }
 
 function bindClassInstance (Class, app) {
@@ -71,7 +73,7 @@ function bindClassInstance (Class, app) {
     
     const desc = Object.getOwnPropertyDescriptor(protos, key);
     if (is.function(desc.value))
-      instance[key] = instance[key].bind(app)
+      instance[key] = instance[key].bind(instance)
   }
   return instance
 }
