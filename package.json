@@ -1,6 +1,6 @@
 {
   "name": "tcb-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Tencent cloudbase lite server framework",
   "main": "./src/index.js",
   "scripts": {
