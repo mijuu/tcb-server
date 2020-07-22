@@ -34,9 +34,13 @@ class Application {
     }
   }
 
-  serve ({ event, router }) {
+  serve ({ event, context, router }) {
     router(this.app);
-    return this.server.serve(event, this.app.ctx);
+    return this.server.serve({
+      event,
+      context,
+      ctx: this.app.ctx
+    });
   }
 }
 

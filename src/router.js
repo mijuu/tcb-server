@@ -5,15 +5,15 @@ class TcbServerRouter extends TcbRouter {
   /**
    * start the route server
    */
-  serve(event, ctx) {
-      ctx.request = { event, url: event.path };
+  serve({ event, context, ctx}) {
+      ctx.request = { event, context, path: event.path };
       let _routerMiddlewares = this._routerMiddlewares;
-      let url = ctx.request.url;
+      let path = ctx.request.path;
 
       // try to  match path
-      if (_routerMiddlewares.hasOwnProperty(url)
+      if (_routerMiddlewares.hasOwnProperty(path)
           || _routerMiddlewares.hasOwnProperty('*')) {
-          let middlewares = (_routerMiddlewares[url]) ? _routerMiddlewares[url].middlewares : [];
+          let middlewares = (_routerMiddlewares[path]) ? _routerMiddlewares[path].middlewares : [];
           // put * path middlewares on the queue head
           if (_routerMiddlewares['*']) {
               middlewares = [].concat(_routerMiddlewares['*'].middlewares, middlewares);
