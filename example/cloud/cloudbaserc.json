@@ -1,5 +1,5 @@
 {
-  "envId": "env-hnvmzxci",
+  "envId": "your env",
   "functionRoot": "./functions",
   "functions": [
     {
@@ -8,7 +8,9 @@
       "envVariables": {},
       "runtime": "Nodejs10.15",
       "memorySize": 128,
-      "handler": "index.main"
+      "handler": "index.main",
+      "installDependency": true,
+      "ignore": ["node_modules", "node_modules/**/*", ".git"]
     }
   ]
 }
