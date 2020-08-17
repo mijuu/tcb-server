@@ -41,7 +41,7 @@ module.exports = app => {
   const { controller, middleware } = app;
 
   // 路由的使用方法参考[tcb-router](https://github.com/TencentCloudBase/tcb-router)
-  app.router('/v1/todo/create', controller.v1.todo.create);
+  app.router('/v1/todo/info', controller.v1.todo.info);
 }
 ```
 
@@ -50,11 +50,12 @@ module.exports = app => {
 // BaseContextClass基类构造了app,ctx,controller,service,cloud这些对象，辅助开发使用
 const BaseContextClass = require('tcb-server').BaseContextClass;
 class Todo extends BaseContextClass {
-  async create () {
+  async info () {
     const { ctx } = this;
     ctx.body = 'hello world!';
   }
- }
+}
+module.exports = Todo;
 ```
 至此，一个最基本的多接口云函数结构就完成了
 
