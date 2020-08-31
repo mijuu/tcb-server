@@ -12,13 +12,18 @@ class Application {
       cloud,
       ctx: {}
     };
+    this.error = null;
     // init tcb sdk
-    this.app.cloud.init(config);
-    this.loadModules();
+    try {
+      this.app.cloud.init(config);
+      this.loadModules();
 
-    this.server = new TcbServerRouter();
-    this.app.router = this.server.router.bind(this.server);
-    this.app.use = this.server.use;
+      this.server = new TcbServerRouter();
+      this.app.router = this.server.router.bind(this.server);
+      this.app.use = this.server.use;
+    } catch (err) {
+      this.error = err;
+    }
   }
 
   loadModules () {
@@ -35,6 +40,10 @@ class Application {
   }
 
   serve ({ event, context, router }) {
+    if (this.error) {
+      console.error(this.error);
+      return { code: 500, name: this.error.name };
+    }
     router(this.app);
     return this.server.serve({
       event,
