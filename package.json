@@ -1,6 +1,6 @@
 {
   "name": "tcb-server",
-  "version": "1.0.3",
+  "version": "1.1.1",
   "description": "Tencent cloudbase lite server framework",
   "keywords": [
     "tencent",
@@ -23,8 +23,8 @@
   "author": "raymond.liang@outlook.com",
   "license": "MIT",
   "dependencies": {
+    "@cloudbase/node-sdk": "^2.3.2",
     "is-type-of": "^1.2.1",
-    "tcb-admin-node": "^1.23.0",
     "tcb-router": "^1.1.2"
   },
   "devDependencies": {

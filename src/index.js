@@ -1,7 +1,7 @@
 'use strict';
 const TcbServerRouter = require('./router');
 const BaseContextClass = require('./base-context-class');
-const cloud = require('tcb-admin-node');
+const tcb = require('@cloudbase/node-sdk');
 const is = require('is-type-of');
 const fs = require('fs');
 const path = require('path');
@@ -9,13 +9,13 @@ const path = require('path');
 class Application {
   constructor (config) {
     this.app = {
-      cloud,
+      cloud: null,
       ctx: {}
     };
     this.error = null;
     // init tcb sdk
     try {
-      this.app.cloud.init(config);
+      this.app.cloud = tcb.init(config);
       this.loadModules();
 
       this.server = new TcbServerRouter();
