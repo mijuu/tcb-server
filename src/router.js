@@ -6,7 +6,9 @@ class TcbServerRouter extends TcbRouter {
    * start the route server
    */
   serve({ event, context, ctx}) {
-      ctx.request = { event, context, path: event.path };
+      // http request or cloud function request
+      const body = event.body ? JSON.parse(event.body) : event;
+      ctx.request = { body, raw: event, context, path: body.path };
       let _routerMiddlewares = this._routerMiddlewares;
       let path = ctx.request.path;
 
