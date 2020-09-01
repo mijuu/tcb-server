@@ -31,7 +31,7 @@ class TcbServerRouter extends TcbRouter {
       }
       else {
           return new Promise((resolve) => {
-              resolve();
+              resolve({ code: 404, message: 'path not found' });
           });
       }
 
