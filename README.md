@@ -56,7 +56,7 @@ module.exports = async function (ctx, next) {
 
 ```javascript
 // controller/v1/todo.js
-// BaseContextClass基类构造了app,ctx,controller,service,cloud这些对象，辅助开发使用
+// BaseContextClass基类构造了app,ctx,controller,service,middleware,cloud这些对象，辅助开发使用
 const BaseContextClass = require('tcb-server').BaseContextClass;
 class Todo extends BaseContextClass {
   async info () {
@@ -104,7 +104,7 @@ ctx.request = { body, raw: event, context, path: event.path }
 #### middleware
 用于放置中间件，在事务流程中可以用来控制或清洗数据，完成后转至下一个路由环节
 
-### cloud
+#### cloud
 初始化过的@cloudbase/node-sdk 实例，可以直接操作云函数、云数据库、云存储
 [@cloudbase/node-sdk](https://github.com/TencentCloudBase/node-sdk)
 
