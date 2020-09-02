@@ -22,8 +22,11 @@ const TcbServer = require('tcb-server').Application;
 const router = require('./router');
 const app = new TcbServer({
   env: 'your env',
-  secretId: 'your secretId',
-  secretKey: 'your secretKey'
+  credentials: {
+    private_key_id: 'your private_key_id',
+    private_key: 'your private_key',
+    env_id: 'your env_id'
+  }
 });
 
 exports.main = async (event) => {
@@ -35,13 +38,19 @@ exports.main = async (event) => {
 ```
 
 ```javascript
-// router.js
-module.exports = app => {
-  // controller, middleware, service目录下的js文件无需引用，可以直接在router中使用
-  const { controller, middleware } = app;
-
-  // 路由的使用方法参考[tcb-router](https://github.com/TencentCloudBase/tcb-router)
-  app.router('/v1/todo/info', controller.v1.todo.info);
+// middleware/verify/auth.js
+module.exports = async function (ctx, next) {
+  try {
+    const { userInfo } = await this.cloud.auth().getEndUserInfo();
+    if (!userInfo.uid)
+      throw new Error('用户未登录');
+    await next();
+  } catch (err) {
+    ctx.body = {
+      code: 401,
+      message: err
+    }
+  }
 }
 ```
 
@@ -57,6 +66,18 @@ class Todo extends BaseContextClass {
 }
 module.exports = Todo;
 ```
+
+```javascript
+// router.js
+module.exports = app => {
+  // controller, middleware, service目录下的js文件无需引用，可以直接在router中使用
+  const { controller, middleware } = app;
+
+  // 路由的使用方法参考[tcb-router](https://github.com/TencentCloudBase/tcb-router)
+  app.router('/v1/todo/info', middleware.verify.auth, controller.v1.todo.info);
+}
+```
+
 至此，一个最基本的多接口云函数结构就完成了
 
 ## router的使用
@@ -71,7 +92,7 @@ app作为根对象，挂载了所有其他对象，直接使用app来获取你�
 #### ctx
 ctx中挂载了用户的请求，具体结构为：
 ```javascript
-ctx.request = { event, context, path: event.path }
+ctx.request = { body, raw: event, context, path: event.path }
 ```
 
 #### controller
@@ -82,6 +103,10 @@ ctx.request = { event, context, path: event.path }
 
 #### middleware
 用于放置中间件，在事务流程中可以用来控制或清洗数据，完成后转至下一个路由环节
+
+### cloud
+初始化过的@cloudbase/node-sdk 实例，可以直接操作云函数、云数据库、云存储
+[@cloudbase/node-sdk](https://github.com/TencentCloudBase/node-sdk)
 
 ## 最佳实例
 
